@@ -1,0 +1,31 @@
+{
+  "name": "@2003scape/rsc-socket",
+  "version": "1.0.0",
+  "description": "encode/decode runescape classic packets",
+  "main": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/2003scape/rsc-socket.git"
+  },
+  "keywords": [
+    "runescape",
+    "classic",
+    "protocol",
+    "network",
+    "packet"
+  ],
+  "author": "2003Scape Team",
+  "license": "AGPL-3.0+",
+  "bugs": {
+    "url": "https://github.com/2003scape/rsc-socket/issues"
+  },
+  "homepage": "https://github.com/2003scape/rsc-socketrotocol#readme",
+  "dependencies": {
+    "buffer": "^5.6.0",
+    "ip-to-int": "^0.3.1",
+    "long": "^4.0.0"
+  }
+}
