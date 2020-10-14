@@ -45,9 +45,9 @@ function getWalk(packet) {
     const { x: targetX, y: targetY } = getCoords(packet);
 
     const steps = [];
-    steps.length = (packet.buffer.length - packet.offset) / 2;
+    const stepsLength = Math.floor(packet.remaining() / 2);
 
-    for (let i = 0; i < steps.length; i += 1) {
+    for (let i = 0; i < stepsLength; i += 1) {
         const deltaX = packet.getByte();
         const deltaY = packet.getByte();
 
@@ -271,6 +271,13 @@ const decoders = {
         const message = decodeMessage(packet.getBytes());
 
         return { username, message };
+    },
+    register(packet) {
+        const version = packet.getShort();
+        const username = packet.getString(20).trim().toLowerCase();
+        const password = packet.getString(20).trim();
+
+        return { version, username, password };
     },
     prayerOn(packet) {
         return { index: packet.getByte() };

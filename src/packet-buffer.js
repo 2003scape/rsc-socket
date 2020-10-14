@@ -17,6 +17,10 @@ class PacketBuffer {
         this.bitOffset = 0;
     }
 
+    remaining() {
+        return this.buffer.length - this.offset;
+    }
+
     writeByte(i) {
         this.buffer[this.offset] = i;
         this.offset += 1;
@@ -98,6 +102,8 @@ class PacketBuffer {
                 (value & BITMASKS[bits]) << (bitOffset - bits);
         }
 
+        this.offset = Math.ceil(byteOffset) + 1;
+
         return this;
     }
 
@@ -113,7 +119,7 @@ class PacketBuffer {
 
     getBytes(length) {
         if (!length) {
-            length = this.buffer.length - this.offset;
+            length = this.remaining();
         }
 
         if (this.offset + length > this.buffer.length) {

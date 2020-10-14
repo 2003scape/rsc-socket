@@ -5,12 +5,7 @@ const serverEncoders = require('./server/encoders');
 const serverOpcodes = require('./opcodes/server');
 const { EventEmitter } = require('events');
 
-const SOCKET_METHODS = [
-    'connect',
-    'destroy',
-    'end',
-    'setKeepAlive'
-];
+const SOCKET_METHODS = ['connect', 'destroy', 'end', 'setKeepAlive'];
 
 const BUFFER_SIZE = 5000;
 
@@ -155,9 +150,16 @@ class RSCSocket extends EventEmitter {
             return;
         }
 
-        const message = { type: handler, ...this.decoders[handler](packet) };
+        try {
+            const message = {
+                type: handler,
+                ...this.decoders[handler](packet)
+            };
 
-        this.emit('message', message);
+            this.emit('message', message);
+        } catch (e) {
+            this.emit('error', e);
+        }
     }
 
     send(data) {
@@ -178,6 +180,7 @@ class RSCSocket extends EventEmitter {
         }
 
         const packet = new PacketBuffer(id, this.sendPacketData);
+
         this.encoders[message.type](packet, message);
         const encoded = packet.build();
 

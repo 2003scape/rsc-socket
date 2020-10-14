@@ -5,13 +5,56 @@ WebSocket ([client](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
 or [server](https://www.npmjs.com/package/ws)), similar to how
 [json-socket](https://www.npmjs.com/package/json-socket) works.
 
+this module handles encoding/decoding of usernames and chat messages as well,
+converting everything to native types.
+
 ## install
 
     $ npm install @2003scape/rsc-socket
 
 ## example
 ```javascript
+const RSCSocket = require('./src');
+const net = require('net');
+
+net.createServer((socket) => {
+    socket = new RSCSocket(socket, true);
+    socket.on('error', (err) => console.error(err));
+
+    socket.on('message', (message) => {
+        console.log('packet recevied', message);
+
+        if (message.type === 'login') {
+            socket.sendMessage({
+                type: 'worldInfo',
+                index: 0,
+                planeWidth: 2304,
+                planeHeight: 1776,
+                planeIndex: 0
+            });
+        }
+    });
+}).listen(43594);
 ```
+
+## api
+### socket = new RSCSocket(net.Socket || WebSocket, isServer = true)
+create a new socket wrapper instance.
+
+### socket.send(data)
+send a raw data buffer (used in login process).
+
+### socket.sendMessage(message)
+send a POJO from to be encoded and written to the socket.
+
+### socket.getIPAddress()
+return the IPv4 address as a string.
+
+### socket.close()
+terminate or destroy the socket.
+
+### socket.on('message', (message) => {})
+received a decoded packet POJO.
 
 ## license
 Copyright 2020  2003Scape Team

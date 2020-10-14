@@ -1,4 +1,3 @@
-const experienceToLevel = require('../experience-to-level');
 const ipInt = require('ip-to-int');
 const { encodeMessage } = require('../chat-message');
 const { encodeUsername } = require('../username');
@@ -35,7 +34,7 @@ const SKILL_NAMES = [
 ];
 
 function writeKnownCharacters(packet, known) {
-    packet.writeBits(known.size, 8);
+    packet.writeBits(known.length, 8);
 
     for (const character of known) {
         if (character.removing) {
@@ -176,6 +175,7 @@ const encoders = {
         packet.writeByte(index).writeShort(id).writeStackInt(amount);
     },
     logoutDeny() {},
+    logoutSuccess() {},
     message(packet, { message }) {
         packet.writeString(message);
     },
@@ -214,7 +214,7 @@ const encoders = {
         }
 
         for (const skillName of SKILL_NAMES) {
-            packet.writeByte(experienceToLevel(skills[skillName].experience));
+            packet.writeByte(skills[skillName].base);
         }
 
         for (const skillName of SKILL_NAMES) {
@@ -265,7 +265,7 @@ const encoders = {
 
         writeHitUpdatesCharacters(packet, hits);
     },
-    regionObjects(packet, { removing, adding }) {
+    regionObjects(packet, { removing = [], adding = [] }) {
         for (const { x, y } of removing) {
             packet.writeShort(60000).writeByte(x).writeByte(y);
         }
@@ -274,7 +274,7 @@ const encoders = {
             packet.writeShort(id).writeByte(x).writeByte(y);
         }
     },
-    regionPlayers(packet, { player, known, adding }) {
+    regionPlayers(packet, { player, known = [], adding = [] }) {
         packet
             .writeBits(player.x, 11)
             .writeBits(player.y, 13)
@@ -284,13 +284,17 @@ const encoders = {
         writeAddingCharacters(packet, adding);
     },
     regionPlayerUpdate(packet, updates) {
-        const length = Object.keys(updates).reduce((a, b) => {
-            return a + updates[b].length;
+        const length = Object.keys(updates).reduce((length, type) => {
+            if (!Array.isArray(updates[type])) {
+                updates[type] = [];
+            }
+
+            return length + updates[type].length;
         }, 0);
 
         packet.writeShort(length);
 
-        for (const { index, id } of updates.bubbleUpdates) {
+        for (const { index, id } of updates.bubbles) {
             packet.writeShort(index).writeByte(0).writeShort(id);
         }
 
@@ -311,15 +315,15 @@ const encoders = {
                 .writeShort(update.victimIndex);
         }
 
-        for (const update of updates.appearance) {
+        for (const update of updates.appearances) {
             packet
                 .writeShort(update.index)
                 .writeByte(5)
-                .addShort(update.appearanceID)
+                .writeShort(update.appearanceIndex)
                 .writeLong(encodeUsername(update.username))
-                .writeByte(update.equipped.length);
+                .writeByte(update.animations.length);
 
-            for (const id of update.equipped) {
+            for (const id of update.animations) {
                 packet.writeByte(id);
             }
 
