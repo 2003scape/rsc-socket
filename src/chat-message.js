@@ -144,7 +144,7 @@ function decodeMessage(encoded) {
             }
         }
 
-        return fromCharArray(decoded.slice(0, newLen));
+        return fromCharArray(decoded.slice(0, newLen)).trim();
     } catch (e) {
         return '.';
     }

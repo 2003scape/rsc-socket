@@ -48,8 +48,8 @@ function getWalk(packet) {
     const stepsLength = Math.floor(packet.remaining() / 2);
 
     for (let i = 0; i < stepsLength; i += 1) {
-        const deltaX = packet.getByte();
-        const deltaY = packet.getByte();
+        const deltaX = packet.getByte() << 24 >> 24;
+        const deltaY = packet.getByte() << 24 >> 24;
 
         steps.push({ deltaX, deltaY });
     }
@@ -59,10 +59,9 @@ function getWalk(packet) {
 
 const decoders = {
     appearance(packet) {
-        // head gender? - un-needed
         packet.getByte();
 
-        const headSprite = packet.getByte();
+        const headSprite = packet.getByte() + 1;
 
         if (!HEAD_SPRITES.has(headSprite)) {
             throw new RangeError(`invalid headSprite: ${headSprite}`);
@@ -70,7 +69,7 @@ const decoders = {
 
         const bodySprite = packet.getByte() + 1;
 
-        if (bodySprite !== 2 || bodySprite !== 5) {
+        if (bodySprite !== 2 && bodySprite !== 5) {
             throw new RangeError(`invalid bodySprite: ${bodySprite}`);
         }
 
@@ -89,10 +88,10 @@ const decoders = {
             throw new RangeError(`invalid topColour: ${topColour}`);
         }
 
-        const bottomColour = packet.getByte();
+        const trouserColour = packet.getByte();
 
-        if (bottomColour > 14) {
-            throw new RangeError(`invalid bottomColour: ${bottomColour}`);
+        if (trouserColour > 14) {
+            throw new RangeError(`invalid bottomColour: ${trouserColour}`);
         }
 
         const skinColour = packet.getByte();
@@ -106,7 +105,7 @@ const decoders = {
             bodySprite,
             hairColour,
             topColour,
-            bottomColour,
+            trouserColour,
             skinColour
         };
     },
@@ -231,8 +230,8 @@ const decoders = {
 
         for (let i = 0; i < length; i += 1) {
             const index = packet.getShort();
-            const appearanceID = packet.getShort();
-            known.push({ index, appearanceID });
+            const appearanceIndex = packet.getShort();
+            known.push({ index, appearanceIndex });
         }
 
         return { known };
@@ -314,10 +313,10 @@ const decoders = {
         return settings;
     },
     settingsPrivacy(packet) {
-        const chat = packet.getByte();
-        const privateChat = packet.getByte();
-        const trade = packet.getByte();
-        const duel = packet.getByte();
+        const chat = !!packet.getByte();
+        const privateChat = !!packet.getByte();
+        const trade = !!packet.getByte();
+        const duel = !!packet.getByte();
 
         return { chat, privateChat, trade, duel };
     },

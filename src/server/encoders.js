@@ -33,44 +33,6 @@ const SKILL_NAMES = [
     'thieving'
 ];
 
-function writeKnownCharacters(packet, known) {
-    packet.writeBits(known.length, 8);
-
-    for (const character of known) {
-        if (character.removing) {
-            packet.writeBits(1, 1).writeBits(1, 1).writeBits(12, 4);
-        } else if (character.moved) {
-            packet
-                .writeBits(1, 1)
-                .writeBits(0, 1)
-                .writeBits(character.sprite, 3);
-        } else if (character.spriteChanged) {
-            packet
-                .writeBits(1, 1)
-                .writeBits(1, 1)
-                .writeBits(character.sprite, 4);
-        } else {
-            packet.writeBits(0, 1);
-        }
-    }
-}
-
-function writeAddingCharacters(packet, adding) {
-    for (const { index, x, y, sprite, id } of adding) {
-        packet
-            .writeBits(index, 16)
-            .writeBits(x, 5)
-            .writeBits(y, 5)
-            .writeBits(sprite, 4);
-
-        if (id) {
-            packet.writeBits(id, 10);
-        } else {
-            packet.writeBits(0, 1);
-        }
-    }
-}
-
 function writeHitUpdatesCharacters(packet, hits) {
     for (const { index, damageTaken, currentHealth, maxHealth } of hits) {
         packet
@@ -250,8 +212,34 @@ const encoders = {
         }
     },
     regionNPCs(packet, { known, adding }) {
-        writeKnownCharacters(packet, known);
-        writeAddingCharacters(packet, adding);
+        packet.writeBits(known.length, 8);
+
+        for (const npc of known) {
+            if (npc.removing) {
+                packet.writeBits(1, 1).writeBits(1, 1).writeBits(3, 2);
+            } else if (npc.moved) {
+                packet
+                    .writeBits(1, 1)
+                    .writeBits(0, 1)
+                    .writeBits(npc.sprite, 3);
+            } else if (npc.spriteChanged) {
+                packet
+                    .writeBits(1, 1)
+                    .writeBits(1, 1)
+                    .writeBits(npc.sprite, 4);
+            } else {
+                packet.writeBits(0, 1);
+            }
+        }
+
+        for (const { index, x, y, sprite, id } of adding) {
+            packet
+                .writeBits(index, 12)
+                .writeBits(x, 5)
+                .writeBits(y, 5)
+                .writeBits(sprite, 4)
+                .writeBits(id, 10);
+        }
     },
     regionNPCUpdate(packet, { chats, hits }) {
         packet.writeShort(chats.length + hits.length);
@@ -280,8 +268,34 @@ const encoders = {
             .writeBits(player.y, 13)
             .writeBits(player.sprite, 4);
 
-        writeKnownCharacters(packet, known);
-        writeAddingCharacters(packet, adding);
+        packet.writeBits(known.length, 8);
+
+        for (const player of known) {
+            if (player.removing) {
+                packet.writeBits(1, 1).writeBits(1, 1).writeBits(3, 2);
+            } else if (player.moved) {
+                packet
+                    .writeBits(1, 1)
+                    .writeBits(0, 1)
+                    .writeBits(player.sprite, 3);
+            } else if (player.spriteChanged) {
+                packet
+                    .writeBits(1, 1)
+                    .writeBits(1, 1)
+                    .writeBits(player.sprite, 4);
+            } else {
+                packet.writeBits(0, 1);
+            }
+        }
+
+        for (const { index, x, y, sprite } of adding) {
+            packet
+                .writeBits(index, 11)
+                .writeBits(x, 5)
+                .writeBits(y, 5)
+                .writeBits(sprite, 4)
+                .writeBits(0, 1);
+        }
     },
     regionPlayerUpdate(packet, updates) {
         const length = Object.keys(updates).reduce((length, type) => {
@@ -371,10 +385,10 @@ const encoders = {
     sleepOpen(packet, { captchaBytes }) {
         packet.writeBytes(captchaBytes);
     },
-    sound(packet, soundName) {
+    sound(packet, { soundName }) {
         packet.writeString(soundName);
     },
-    systemUpdate(packet, seconds) {
+    systemUpdate(packet, { seconds }) {
         packet.writeShort(seconds * 50);
     },
     teleportBubble(packet, { type, x, y }) {

@@ -77,6 +77,10 @@ class RSCSocket extends EventEmitter {
 
     onData(data) {
         if (this.readSize >= this.readPacketData.length) {
+            this.emit(
+                'error',
+                new RangeError('read more than 5K bytes without a packet')
+            );
             return;
         }
 
@@ -112,6 +116,7 @@ class RSCSocket extends EventEmitter {
             offset += length;
 
             if (length < 160) {
+                // the last byte is sent first in this instance
                 packetData = Buffer.concat([
                     packetData.slice(1),
                     packetData.slice(0, 1)
@@ -224,7 +229,10 @@ class RSCSocket extends EventEmitter {
     }
 
     toString() {
-        return `[RSCSocket ${this.getIPAddress()} (web=${this.isWebSocket})]`;
+        return (
+            `[RSCSocket (ip=${this.getIPAddress()}, ` +
+            `web=${this.isWebSocket})]`
+        );
     }
 }
 
