@@ -155,6 +155,11 @@ class RSCSocket extends EventEmitter {
             return;
         }
 
+        if (!this.decoders[handler]) {
+            this.emit('error', new RangeError(`no handler for ${handler}`));
+            return;
+        }
+
         try {
             const message = {
                 type: handler,

@@ -61,7 +61,7 @@
     "tradeDecline": 230,
     "tradeItemUpdate": 46,
     "useWithGroundItem": 53,
-    "useWithInventoryTtem": 91,
+    "useWithInventoryItem": 91,
     "useWithNPC": 135,
     "useWithObject": 115,
     "useWithPlayer": 113,

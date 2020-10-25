@@ -124,17 +124,26 @@ const encoders = {
     inventoryItems(packet, { items }) {
         packet.writeByte(items.length);
 
-        for (const { id, amount = 1, equipped } of items) {
+        for (const { id, amount, equipped } of items) {
             packet
-                .writeShort(id + (equipped ? 32768 : 0))
-                .writeStackInt(amount);
+                .writeShort(id + (equipped ? 32768 : 0));
+
+            if (typeof amount === 'number') {
+                packet.writeStackInt(amount);
+            }
         }
     },
     inventoryItemRemove(packet, { index }) {
         packet.writeByte(index);
     },
-    inventoryItemUpdate(packet, { index, id, amount }) {
-        packet.writeByte(index).writeShort(id).writeStackInt(amount);
+    inventoryItemUpdate(packet, { index, id, amount, equipped }) {
+        packet
+            .writeByte(index)
+            .writeShort(id + (equipped ? 32768 : 0));
+
+        if (typeof amount === 'number') {
+            packet.writeStackInt(amount);
+        }
     },
     logoutDeny() {},
     logoutSuccess() {},
@@ -200,7 +209,6 @@ const encoders = {
     },
     regionGroundItems(packet, { removing, adding }) {
         for (const { id, x, y } of removing) {
-            // TODO check if it's distance-related, then do 255 maybe?
             packet
                 .writeShort(id + 32768)
                 .writeByte(x)
@@ -218,15 +226,9 @@ const encoders = {
             if (npc.removing) {
                 packet.writeBits(1, 1).writeBits(1, 1).writeBits(3, 2);
             } else if (npc.moved) {
-                packet
-                    .writeBits(1, 1)
-                    .writeBits(0, 1)
-                    .writeBits(npc.sprite, 3);
+                packet.writeBits(1, 1).writeBits(0, 1).writeBits(npc.sprite, 3);
             } else if (npc.spriteChanged) {
-                packet
-                    .writeBits(1, 1)
-                    .writeBits(1, 1)
-                    .writeBits(npc.sprite, 4);
+                packet.writeBits(1, 1).writeBits(1, 1).writeBits(npc.sprite, 4);
             } else {
                 packet.writeBits(0, 1);
             }
