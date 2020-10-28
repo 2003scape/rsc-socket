@@ -314,8 +314,8 @@ const encoders = {
             packet.writeShort(index).writeByte(0).writeShort(id);
         }
 
-        for (const { index, message, type = 1 } of updates.chats) {
-            packet.writeShort(index).writeByte(type);
+        for (const { index, message, dialogue = false } of updates.chats) {
+            packet.writeShort(index).writeByte(dialogue ? 6 : 1);
 
             const encoded = encodeMessage(message);
             packet.writeByte(encoded.length).writeBytes(encoded);

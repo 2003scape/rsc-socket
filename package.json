@@ -1,6 +1,6 @@
 {
   "name": "@2003scape/rsc-socket",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "encode/decode runescape classic packets",
   "main": "./src/index.js",
   "scripts": {
