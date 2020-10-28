@@ -393,8 +393,8 @@ const encoders = {
     systemUpdate(packet, { seconds }) {
         packet.writeShort(seconds * 50);
     },
-    teleportBubble(packet, { type, x, y }) {
-        packet.writeBytes([type, x, y]);
+    teleportBubble(packet, { bubbleType, x, y }) {
+        packet.writeBytes([bubbleType, x, y]);
     },
     tradeClose() {},
     tradeConfirmOpen(packet, { recipient, recipientItems, items }) {
