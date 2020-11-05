@@ -376,8 +376,8 @@ const encoders = {
         packet
             .writeByte(items.length)
             .writeByte(general)
-            .writeByte(sellMultiplier)
-            .writeByte(buyMultiplier);
+            .writeByte(buyMultiplier)
+            .writeByte(sellMultiplier);
 
         for (const { id, amount = 1, price } of items) {
             packet.writeShort(id).writeShort(amount).writeByte(price);

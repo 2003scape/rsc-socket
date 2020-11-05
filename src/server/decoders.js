@@ -391,13 +391,13 @@ const decoders = {
     walkAction: getWalk,
     wallObjectCommandOne(packet) {
         const { x, y } = getCoords(packet);
-        const index = packet.getShort();
+        const index = packet.getByte();
 
         return { x, y, index };
     },
     wallObjectCommandTwo(packet) {
         const { x, y } = getCoords(packet);
-        const index = packet.getShort();
+        const index = packet.getByte();
 
         return { x, y, index };
     }
