@@ -111,26 +111,26 @@ const decoders = {
     },
     bankClose() {},
     bankDeposit(packet) {
-        const slot = packet.getShort();
+        const id = packet.getShort();
         const amount = packet.getShort();
-        const magic = packet.getInt();
+        const magic = packet.getInt() >>> 0;
 
         if (magic !== MAGIC_BANK_DEPOSIT) {
             throw new Error(`invalid magic bank number: ${magic}`);
         }
 
-        return { slot, amount };
+        return { id, amount };
     },
     bankWithdraw(packet) {
-        const slot = packet.getShort();
+        const id = packet.getShort();
         const amount = packet.getShort();
-        const magic = packet.getInt();
+        const magic = packet.getInt() >>> 0;
 
         if (magic !== MAGIC_BANK_WITHDRAW) {
             throw new Error(`invalid magic bank number: ${magic}`);
         }
 
-        return { slot, amount };
+        return { id, amount };
     },
     castGround(packet) {
         const { x, y } = getCoords(packet);

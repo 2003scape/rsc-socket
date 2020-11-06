@@ -55,8 +55,8 @@ const encoders = {
     bankOpen(packet, { maxItems = 48, items }) {
         packet.writeByte(items.length).writeByte(maxItems);
 
-        for (const item of items) {
-            packet.writeShort(item.id).writeStackInt(item.amount);
+        for (const { id, amount = 1 } of items) {
+            packet.writeShort(id).writeStackInt(amount);
         }
     },
     bankUpdate(packet, { index, id, amount }) {
