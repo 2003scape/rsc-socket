@@ -337,13 +337,13 @@ const decoders = {
         const bytes = packet.getBytes();
 
         // they're sending us a sleep word during the delay
-        if (bytes[bytes.length - 1] !== 0) {
+        if (bytes[bytes.length - 1] === 0) {
             return;
         }
 
         packet.offset -= bytes.length;
 
-        return { sleepWord: packet.getString(bytes.length - 1) };
+        return { sleepWord: packet.getString() };
     },
     tradeAccept() {},
     tradeConfirmAccept() {},

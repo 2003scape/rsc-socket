@@ -387,6 +387,7 @@ const encoders = {
     sleepOpen(packet, { captchaBytes }) {
         packet.writeBytes(captchaBytes);
     },
+    sleepIncorrect() {},
     sound(packet, { soundName }) {
         packet.writeString(soundName);
     },
