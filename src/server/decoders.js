@@ -188,7 +188,13 @@ const decoders = {
     },
     closeConnection() {},
     combatStyle(packet) {
-        return { combatStyle: packet.getByte() };
+        const combatStyle = packet.getByte();
+
+        if (combatStyle < 0 || combatStyle > 3) {
+            return RangeError(`combat style out of range ${combatStyle}`);
+        }
+
+        return { combatStyle };
     },
     command(packet) {
         const split = packet.getString().split(' ');

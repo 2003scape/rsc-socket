@@ -326,7 +326,7 @@ const encoders = {
         for (const update of updates.projectiles) {
             packet
                 .writeShort(update.index)
-                .writeShort(update.victimType)
+                .writeByte(update.victimType)
                 .writeShort(update.projectileType)
                 .writeShort(update.victimIndex);
         }
